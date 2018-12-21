@@ -1,34 +1,31 @@
 package dvd_screensaver;
 
 import javafx.application.Application;
-import javafx.application.Platform;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.CacheHint;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
 import javafx.scene.effect.ColorAdjust;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 
-import javax.xml.soap.Text;
 import java.io.File;
-import java.util.function.Function;
 
 public class Main extends Application {
 
     private static final double img_width = 300;
     private static final double img_height = img_width / 1.9;
-    private int lastImgN = 0;
+    private int last_img_n = (int) (Math.random()*7);
 
     private ImageView imageView;
+    private Image[] images;
 
     @Override
     public void start(Stage primaryStage) throws Exception {
@@ -46,6 +43,8 @@ public class Main extends Application {
         primaryStage.setX(0);
         primaryStage.setY(0);*/
 
+
+
         Rectangle2D primaryScreenBounds = Screen.getPrimary().getBounds();
         double width = primaryScreenBounds.getWidth();
         double height = primaryScreenBounds.getHeight();
@@ -53,25 +52,20 @@ public class Main extends Application {
         Canvas canvas = new Canvas(width, height);
         String current = new File(".").getCanonicalPath();
         System.out.println(current);
-        Image image = new Image("file:src/dvd_screensaver/dvdlogo-0"+lastImgN+".png", img_width, img_height, false, false);
-        //create vector of images...
-        //create better resolution logo
+        images = new Image[8];
 
-        GraphicsContext gc = canvas.getGraphicsContext2D();
-        gc.drawImage(image, 0, 0);
+        for (int i=0;i<=7;i++) {
+            images[i] = new Image("file:src/dvd_screensaver/dvdlogo_"+i+".png", img_width, img_height, false, false);
+        }
 
         Pane root = new Pane();
         root.setMinWidth(width);
         root.setMinHeight(height);
-        imageView = new ImageView(image);
+
+        imageView = new ImageView();
         root.getChildren().add(imageView);
 
-        ColorAdjust blackout = new ColorAdjust();
-        blackout.setBrightness(-1.0);
-
-        imageView.setEffect(blackout);
-        imageView.setCache(true);
-        imageView.setCacheHint(CacheHint.SPEED);
+        imageView.setImage(images[0]);
 
         primaryStage.setFullScreen(true);
         primaryStage.setResizable(false);
@@ -79,7 +73,11 @@ public class Main extends Application {
         primaryStage.setHeight(height);
         primaryStage.setX(0);
         primaryStage.setY(0);
-        primaryStage.setScene(new Scene(root));
+
+        Scene scene = new Scene(root);
+        scene.setFill(Color.BLACK);
+
+        primaryStage.setScene(scene);
         primaryStage.show();
 
         primaryStage.addEventHandler(KeyEvent.KEY_RELEASED, (KeyEvent event) -> {
@@ -92,8 +90,8 @@ public class Main extends Application {
         new Thread(() -> {
             double x = 0;
             double y = 0;
-            final int increment_x = 2;
-            final int increment_y = 2;
+            final int increment_x = 1;
+            final int increment_y = 1;
             int direction_x = 1; // 1 to go right, -1 to go left
             int direction_y = 1; // 1 to go down, -1 to go up
             final int sleep = 10;
@@ -131,9 +129,11 @@ public class Main extends Application {
     }
 
     private void bounce() {
-        int is = -1;
-        while (is == lastImgN) {
-            is = (int) Math.round(Math.random() * 7);
-        }
+        int new_n;
+        do {
+            new_n = (int) (Math.random() * 7);
+        } while (new_n == last_img_n);
+        last_img_n = new_n;
+        imageView.setImage(images[new_n]);
     }
 }
