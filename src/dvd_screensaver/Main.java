@@ -55,7 +55,7 @@ public class Main extends Application {
         images = new Image[8];
 
         for (int i=0;i<=7;i++) {
-            images[i] = new Image("file:src/dvd_screensaver/dvdlogo_"+i+".png", img_width, img_height, false, false);
+            images[i] = new Image("file:dvdlogo_"+i+".png", img_width, img_height, false, false);
         }
 
         Pane root = new Pane();
